@@ -1,5 +1,6 @@
 function assignment_2(image_path)
 
+
 % ORIGINAL IMAGE
 
 im = imread(image_path);
@@ -20,6 +21,7 @@ imshow(im);
 
 image_title = 'Corresponding image';
 title(image_title);
+
 
 % LOW CONTRAST
 % The histogram values are squeezed together,
@@ -47,26 +49,26 @@ subplot(2,3,5);
 imshow(im_lc);
 title(image_title);
 
+
 % HISTOGRAM EQUALIZATION
+% The histogram is not flat because we are dealing with
+% discretized intensity values.
 
 im_lc_hist_normalized_sum = 255 * cumsum(im_lc_hist_normalized);
-
-im_lc_hist_normalized_sum_rounded = ...
-    arrayfun(@(x) round(x), im_lc_hist_normalized_sum);
 
 im_lc_eq = im_lc;
 for i = 1:rows
     for j = 1:columns
-        im_lc_eq(i,j) = im_lc_hist_normalized_sum_rounded(im_lc(i,j));
+        im_lc_eq(i,j) = round(im_lc_hist_normalized_sum(im_lc(i,j)));
+        %im_lc_eq(i,j) = im_lc_hist_normalized_sum_rounded(im_lc(i,j));
     end
 end
 
-im_lc_hist_normalized_sum_rounded_renormalized = ...
-    im_lc_hist_normalized_sum_rounded ./ ...
-    sum(im_lc_hist_normalized_sum_rounded);
+im_lc_eq_hist = hist(im_lc_eq(:), 0:255);
+im_lc_eq_hist_normalized = im_lc_eq_hist ./ sum(im_lc_eq_hist);
 
 subplot(2,3,3);
-bar(im_lc_hist_normalized_sum_rounded_renormalized);
+bar(im_lc_eq_hist_normalized);
 title({head_title, '(Equalized)'});
 ax3 = gca;
 
@@ -75,9 +77,8 @@ imshow(im_lc_eq);
 title(image_title);
 
 
-global_max = 1.1 * ...
-    max( [max(normalized_im_hist) max(im_lc_hist_normalized) ...
-    max(im_lc_hist_normalized_sum_rounded_renormalized) ] );
+global_max = 1.1 * max( [max(normalized_im_hist) ...
+    max(im_lc_hist_normalized) max(im_lc_eq_hist_normalized) ] );
 
 for ax = [ax1 ax2 ax3]
     ax.XLim = [0 255];
