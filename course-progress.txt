@@ -1,4 +1,4 @@
-Lectures:     * * 3 4 5 6
+Lectures:     * * * 4 (5) 6
 
 Assignments:
 1: 1 * 3i * 3iii 3iv 3v 4i 4ii
@@ -7,4 +7,4 @@ Assignments:
 
 Excercises:   1 2 3
 
-Projects:     1 2 3
+Projects:     * 2 3

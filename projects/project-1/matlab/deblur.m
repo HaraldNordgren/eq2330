@@ -7,3 +7,5 @@ estimated_nsr = noise_var / var(im_blurry(:));
 im_blurry_tapered = edgetaper(im_blurry, h);
 
 im_deblurred = deconvwnr(im_blurry_tapered, h, estimated_nsr);
+
+end

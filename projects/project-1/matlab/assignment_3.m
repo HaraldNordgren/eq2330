@@ -5,7 +5,7 @@ function assignment_3(image_path)
 
 im = double(imread(image_path));
 
-figure('Position', [0, 0, 940, 590]);
+figure_with_size;
 subplot(2,3,1);
 imshow(im, [0 255]);
 title('Original');

@@ -6,7 +6,7 @@ function assignment_2_1(image_path)
 im = imread(image_path);
 [rows, columns] = size(im);
 
-figure('Position', [0, 0, 940, 590]);
+figure_with_size;
 subplot(2,3,1);
 imshow(im);
 
@@ -79,12 +79,12 @@ ax3 = gca;
 global_max = 1.1 * max( [max(normalized_im_hist) ...
     max(im_lc_hist_normalized) max(im_lc_eq_hist_normalized) ] );
 
+ylabel(ax1, 'h(r)');
 for ax = [ax1 ax2 ax3]
-    ax.XLim = [0 255];
+    ax.XLim = [-5 260];
     xlabel(ax, 'r');
     
     ax.YLim = [0 global_max];
-    ylabel(ax, 'h(r)');
 end
 
 print('../report/images/2-1', '-deps');
