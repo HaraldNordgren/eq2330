@@ -1,0 +1,4 @@
+F	original
+G	degraded image
+H	degradation function	(h in matlab)
+S	Power spectrum

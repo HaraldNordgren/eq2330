@@ -6,6 +6,7 @@ function assignment_2_2(image_path)
 im = imread(image_path);
 [rows, columns] = size(im);
 
+figure('Position', [0, 0, 940, 590]);
 subplot(2,3,1);
 imshow(im);
 title('No added noise');
@@ -67,17 +68,16 @@ for ax = [ax11 ax12 ax13]
     ax.YLim = [0 global_max_noised];
 end
 
+print('../report/images/2-2_noised', '-deps');
 
-% FILTERS
-
-kernel = ones(3,3) / 9;
-figure;
 
 
 % GAUSS NOISE MEAN FILTERED
 
+kernel = ones(3,3) / 9;
 im_gauss_mean = uint8(round(conv2(double(im_gauss), kernel, 'same')));
 
+figure('Position', [0, 0, 1200, 590]);
 subplot(2,4,1);
 imshow(im_gauss_mean);
 title({'Gauss noise', 'mean filtered'});
@@ -155,9 +155,4 @@ for ax = [ax21 ax22 ax23 ax24]
     ax.YLim = [0 global_max_filtered];
 end
 
-% The mean filter replaces each value with the mean of the surrounding
-% values. The median replaces it with the median (that is, sorting the
-% values by size and choosing the middle one). The mean filter is quicker
-% to calculate -- no sorting is needed -- but the median filter is likely
-% to give slightly better results when dealing with outlier noise, which is
-% why it gives such a good performance for the salt and pepper noise.
+print('../report/images/2-2_filtered', '-deps');

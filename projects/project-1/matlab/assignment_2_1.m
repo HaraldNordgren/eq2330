@@ -1,4 +1,4 @@
-function assignment_2(image_path)
+function assignment_2_1(image_path)
 
 
 % ORIGINAL IMAGE
@@ -6,21 +6,22 @@ function assignment_2(image_path)
 im = imread(image_path);
 [rows, columns] = size(im);
 
+figure('Position', [0, 0, 940, 590]);
+subplot(2,3,1);
+imshow(im);
+
+image_title = 'Original';
+title(image_title);
+
 im_hist = hist(im(:), 0:255);
 normalized_im_hist = im_hist ./ sum(im_hist);
 
-subplot(2,3,1);
+subplot(2,3,4);
 bar(normalized_im_hist);
 ax1 = gca;
 
-head_title = 'Normalized histogram';
-title({head_title, '(Normal contrast)'});
-
-subplot(2,3,4);
-imshow(im);
-
-image_title = 'Corresponding image';
-title(image_title);
+head_title = 'Histogram';
+title(head_title);
 
 
 % LOW CONTRAST
@@ -37,22 +38,20 @@ for i = 1:rows
     end
 end
 
+subplot(2,3,2);
+imshow(im_lc);
+title('Low contrast');
+
 im_lc_hist = hist(im_lc(:), 0:255);
 im_lc_hist_normalized = im_lc_hist ./ sum(im_lc_hist);
 
-subplot(2,3,2);
-bar(im_lc_hist_normalized);
-title({head_title, '(Low contrast)'});
-ax2 = gca;
-
 subplot(2,3,5);
-imshow(im_lc);
-title(image_title);
+bar(im_lc_hist_normalized);
+title(head_title);
+ax2 = gca;
 
 
 % HISTOGRAM EQUALIZATION
-% The histogram is not flat because we are dealing with
-% discretized intensity values.
 
 im_lc_hist_normalized_sum = 255 * cumsum(im_lc_hist_normalized);
 
@@ -64,17 +63,17 @@ for i = 1:rows
     end
 end
 
+subplot(2,3,3);
+imshow(im_lc_eq);
+title('Equalized');
+
 im_lc_eq_hist = hist(im_lc_eq(:), 0:255);
 im_lc_eq_hist_normalized = im_lc_eq_hist ./ sum(im_lc_eq_hist);
 
-subplot(2,3,3);
-bar(im_lc_eq_hist_normalized);
-title({head_title, '(Equalized)'});
-ax3 = gca;
-
 subplot(2,3,6);
-imshow(im_lc_eq);
-title(image_title);
+bar(im_lc_eq_hist_normalized);
+title(head_title);
+ax3 = gca;
 
 
 global_max = 1.1 * max( [max(normalized_im_hist) ...
@@ -82,7 +81,12 @@ global_max = 1.1 * max( [max(normalized_im_hist) ...
 
 for ax = [ax1 ax2 ax3]
     ax.XLim = [0 255];
+    xlabel(ax, 'r');
+    
     ax.YLim = [0 global_max];
+    ylabel(ax, 'h(r)');
 end
+
+print('../report/images/2-1', '-deps');
 
 end
