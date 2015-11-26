@@ -1,22 +1,23 @@
-function x_dct_q = assignment_2_1(x, delta)
+function A = assignment_2_1(delta)
 
-M = 8;
+M = 8; m = 10;
 %delta = 0.1;
 
-if ~isequal(size(x), [M M])
-    error('Matrix size must be 8x8!')
-end
+%x = square_matrix(M);
+
+im = double(imread('../images/boats512x512.tif'));
+x = im(1+m:M+m, 1+m:M+m);
 
 subplot(1,4,1);
 plot_block_matrix(x);
 
 
-% CALCULATE DCT
+% CALCULATE DCT TRANSFORM MATRIX
 
 A = zeros(M);
 
-alpha = sqrt(1/M);
-alpha = [alpha ones(1,M-1) * sqrt(2/M)];
+alpha = sqrt(2/M) * ones(1,M);
+alpha(1) = sqrt(1/M);
 
 for i = 0:M-1
     for k = 0:M-1
@@ -46,29 +47,5 @@ x_recon = A' * x_dct_q * A;
 
 subplot(1,4,4);
 plot_block_matrix(x_recon);
-
-
-% MSE
-
-mse_x = my_mse(x_recon, x);
-mse_coeffs = my_mse(x_dct, x_dct_q);
-mse_ratio = mse_coeffs / mse_x;
-
-psnr = my_psnr(mse_x);
-
-
-% VLC
-
-
-[occ, symbols] = hist(x_dct_q(:), unique(x_dct_q(:)));
-p = occ ./ sum(occ);
-
-dict = huffmandict(symbols,p);
-hcode = huffmanenco(x_dct_q(:),dict);
-
-dhsig = huffmandeco(hcode,dict);
-%reshape(dhsig, [M M])
-
-length(dhsig)
 
 end
