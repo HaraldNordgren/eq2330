@@ -5,12 +5,13 @@ psnrs = exponents;
 
 for i = exponents
     [bits, psnr_im] = ...
-        assignment_2_3('../images/boats512x512.tif', 2^i);
+        assignment_2_3(2^i);
     
     bitrates(i+1) = bits;
     psnrs(i+1) = psnr_im;
 end
 
+figure;
 plot(bitrates, psnrs);
 xlabel('Bitrate');
 ylabel('PSNR');

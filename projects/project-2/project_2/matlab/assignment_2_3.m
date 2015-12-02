@@ -1,60 +1,76 @@
-function [total_bits, psnr_im] = assignment_2_3(image_path, delta)
+function [total_bits, psnr_im] = assignment_2_3(delta)
+
+%figure;
 
 M = 8;
 %delta = 0.1;
 %x = square_matrix(8);
 
-%image_paths = ['boats', 'habour', 'peppers'];
-%path_prefix = '../images/'
-%path_suffix = '512x512.tif'
+image_paths = {'boats', 'harbour', 'peppers'};
+path_prefix = '../images/';
+path_suffix = '512x512.tif';
 
-im = double(imread(image_path));
+size_im = [512 512];
+size_blocks = size_im / M;
 
-if ~isequal(mod(size(im), M), [0 0])
-    error('Image dimensions must be divisible by 8!')
-end
+coeff_bins = ...
+    zeros(size_blocks(1), size_blocks(2), length(image_paths), M, M);
+mse_im = zeros(1,length(image_paths));
+
+for i = 1:length(image_paths)
+    image_shortpath = image_paths(i);
+    image_path = [path_prefix image_shortpath{1} path_suffix];
+    im = double(imread(image_path));
 
 
-% LOOP OVER IMAGES IN 8x8 BLOCKS
+    % LOOP OVER IMAGE IN 8x8 BLOCKS
 
-size_blocks = size(im) / M;
-coeff_bins = zeros(size_blocks(1), size_blocks(2), M, M);
+    im_recon = zeros(size(im));
 
-im_recon = zeros(size(im));
+    for row = 1:size_blocks(1)
+        for column = 1:size_blocks(2)
 
-for row = 1:size_blocks(1)
-    for column = 1:size_blocks(2)
-        
-        % EXTRACT 8x8 BLOCK FROM IMAGE
-        
-        %row_indices = (row-1)*M+1:row*M;
-        %column_indices = (column-1)*M+1:column*M;
-        row_indices = block_indices(row, M);
-        column_indices = block_indices(column, M);
-        
-        x = im(row_indices, column_indices);
-        
-        %DCT TRANSFORM
-        x_dct = dct2(x);
+            % EXTRACT 8x8 BLOCK FROM IMAGE
 
-        % QUANTIZATION
-        x_dct_q = mid_tread_quant(x_dct, delta);
-        coeff_bins(row, column,:,:) = x_dct_q;
+            row_indices = block_indices(row, M);
+            column_indices = block_indices(column, M);
 
-        % INVERSE DCT TRANSFORM
-        x_recon = idct2(x_dct_q);
+            x = im(row_indices, column_indices);
 
-        im_recon(row_indices, column_indices) = x_recon;
+            %DCT TRANSFORM
+            x_dct = dct2(x);
 
-        %{
-        % MSE
+            % QUANTIZATION
+            x_dct_q = mid_tread_quant(x_dct, delta);
+            coeff_bins(row,column,i,:,:) = x_dct_q;
 
-        mse_coeffs = my_mse(x_dct, x_dct_q);
-        mse_ratio = mse_coeffs / mse_x;
-        %}
+            % INVERSE DCT TRANSFORM
+            x_recon = idct2(x_dct_q);
+            im_recon(row_indices, column_indices) = x_recon;
+            
+            %{
+            % MSE
 
+            mse_coeffs = my_mse(x_dct, x_dct_q);
+            mse_ratio = mse_coeffs / mse_x;
+            %}
+
+        end
     end
+    
+    mse_im(i) = my_mse(im_recon, im);
+    
+    %{
+    subplot(1, length(image_paths), i);
+    imagesc(im_recon);
+    axis off;
+    axis square;
+    colormap(gray);
+    %}
 end
+
+d = mean(mse_im);
+psnr_im = my_psnr(d);
 
 
 % VLC
@@ -63,12 +79,12 @@ entropies = zeros(M);
 
 for row = 1:M
     for column = 1:M
-        i_coeff = coeff_bins(:,:,row,column);
+        i_coeff = coeff_bins(:,:,:,row,column);
         
         [occ, symbols] = hist(i_coeff(:), unique(i_coeff(:)));
         p = occ ./ sum(occ);
         
-        entropy = sum(p .* log(1 ./ p));
+        entropy = -sum(p .* log2(p));
         entropies(row, column) = entropy;
 
         %dict = huffmandict(symbols,p);
@@ -83,16 +99,6 @@ for row = 1:M
 end
 
 total_bits = sum(entropies(:));
-
-mse_im = my_mse(im_recon, im);
-psnr_im = my_psnr(mse_im);
-
-%{
-imagesc(im_recon);
-axis off;
-axis square;
-colormap(gray);
-%}
 
 end
 
