@@ -1,8 +1,12 @@
+function [bitrate_kbps, psnr] = assignment_2_1(delta, framerate)
+
 M = 16;
 qcif = [176 144];
 
-delta = 0.1;
-frames = 20;
+%delta = 8;
+%framerate = 30;
+
+frames = 50;
 
 input_prefix = '../../foreman_qcif/'; input_title = 'foreman_qcif';
 %input_prefix = '../../mother-daughter_qcif/'; input_title = 'mother-daughter_qcif';
@@ -13,10 +17,10 @@ input = [ input_prefix input_title input_suffix ];
 video = yuv_import_y(input, qcif, frames);
 video_recon = video;
 
-size_blocks = qcif / 16;
+size_blocks = qcif / M;
 
 coeff_bins = zeros(size_blocks(1), size_blocks(2), frames, M, M);
-
+psnr_frames = zeros(1, frames);
 
 for i = 1:frames
     
@@ -61,6 +65,9 @@ for i = 1:frames
         end
     end
     
+    mse = my_mse(frame_recon, video{i});
+    psnr_frames(i) = my_psnr(mse);
+    
     video{i} = uint8(video{i});
     video_recon{i} = uint8(frame_recon);
     
@@ -71,12 +78,22 @@ end
 
 output_suffix = '.avi';
 
-create_video(video, [input_prefix input_title output_suffix]);
-create_video(video_recon, [input_prefix input_title '_recon' output_suffix]);
+output_title = [input_prefix input_title '_q' int2str(delta) ...
+    '_recon' output_suffix];
+
+%create_video(video, [input_prefix input_title output_suffix], framerate);
+create_video(video_recon, output_title, framerate);
 
 
 
-% CALCULATE VLC (AS ENTROPY)
+% CALCULATE TEST DATA
 
 entropies = calculate_vlc(coeff_bins, M);
-total_bits = sum(entropies(:));
+bits = sum(entropies(:));
+
+bitrate = bits * framerate / frames;
+bitrate_kbps = bitrate / 1000;
+
+psnr = mean(psnr_frames(:));
+
+end

@@ -1,7 +1,7 @@
-function create_video(im_sequence, filename)
+function create_video(im_sequence, filename, framerate)
 
 outputVideo = VideoWriter(filename);
-outputVideo.FrameRate = 30;
+outputVideo.FrameRate = framerate;
 
 open(outputVideo)
 
