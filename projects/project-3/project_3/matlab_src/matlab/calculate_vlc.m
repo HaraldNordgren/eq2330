@@ -1,6 +1,8 @@
-function entropies = calculate_vlc(coeff_bins, M)
+function bits = calculate_vlc(coeff_bins, M, mode_bit)
 
-entropies = zeros(M);
+sz = size(coeff_bins);
+
+bits = zeros(M);
 
 for row = 1:M
     for column = 1:M
@@ -11,9 +13,18 @@ for row = 1:M
         p = occ ./ sum(occ);
         
         entropy = -sum(p .* log2(p));
-        entropies(row, column) = entropy;
+        bits(row, column) = entropy;
         
     end
 end
+
+%{
+if mode_bit
+    % Add one bit per block per frame
+    bits = bits + sz(3);
+end
+%}
+
+%bits = bits * sz(1) * sz(2) * sz(3);
 
 end
