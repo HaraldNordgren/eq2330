@@ -5,12 +5,15 @@ M = 16;
 qcif = [176 144];
 size_blocks = qcif / M;
 
-%Q = 16;
-%framerate = 30;
-%frames = 50;
+%{
+Q = 16;
+framerate = 30;
+frames = 50;
+time_str = datestr(now, 'HH_MM_SS');
+%}
 
-%lambda = 0.02 * Q^2;
-lambda = 0.001 * Q^2;
+lambda = 0.02 * Q^2;
+%lambda = 0.001 * Q^2;
 
 input_prefix = '../../foreman_qcif/'; input_title = 'foreman_qcif';
 %input_prefix = '../../mother-daughter_qcif/'; input_title = 'mother-daughter_qcif';
@@ -80,6 +83,10 @@ video_recon_rep = video_recon_intra;
 rep_psnr_frames = zeros(1, frames);
 total_copy_bits = 0;
 
+% Calculate VLC?
+R_intra = sum(bits_per_coeff(:)) + 1;
+R_copy = 1;
+
 for i = 2:frames
     
     frame = video{i};
@@ -98,13 +105,11 @@ for i = 2:frames
             
             % INTRA MODE
             D_intra = my_mse(intra_block, block);
-            R_intra = sum(bits_per_coeff(:)) + 1;
             J_intra = D_intra + lambda * R_intra;
             
             % COPY MODE
             copy_block = last_frame(row_indices, column_indices);
             D_copy = my_mse(copy_block, block);
-            R_copy = 1;
             J_copy = D_copy + lambda * R_copy;
             
             if J_copy <= J_intra

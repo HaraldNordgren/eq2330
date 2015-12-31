@@ -1,4 +1,4 @@
-time_str = datestr(now, 'HH_MM_SS');
+time_str = datestr(now, 'mmdd_HHMM_SS');
 
 frames = 50;
 framerate = 30;
